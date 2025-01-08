@@ -8,6 +8,7 @@ from labelu.internal.domain.models.task import Task
 from labelu.internal.adapter.persistence import crud_user
 from labelu.internal.adapter.persistence import crud_task
 from labelu.internal.adapter.persistence import crud_attachment
+from labelu.tests.utils.utils import empty_task_upload
 
 
 class TestClassTaskAttachmentRouter:
@@ -21,28 +22,68 @@ class TestClassTaskAttachmentRouter:
             "description": "task description",
             "tips": "task tips",
         }
+        
+        task = client.post(
+            f"{settings.API_V1_STR}/tasks", headers=testuser_token_headers, json=data
+        )
+        task_id = task.json()["data"]["id"]
+        
+        empty_task_upload(task_id, "test.png")
+
+        # run
+        with Path("labelu/tests/data/test.png").open(mode="rb") as f:
+            png_res = client.post(
+                f"{settings.API_V1_STR}/tasks/{task_id}/attachments",
+                headers=testuser_token_headers,
+                files={"file": ("test.png", f, "image/png")},
+            )
+        # check
+        json = png_res.json()
+        assert png_res.status_code == 201
+        
+        parts = json["data"]["url"].split("/")[-3:]
+        assert Path(f"{settings.MEDIA_ROOT}").joinpath("/".join(parts)).exists()
+        parts[-1] = "test-thumbnail.png"
+        assert Path(f"{settings.MEDIA_ROOT}").joinpath("/".join(parts)).exists()
+        
+        empty_task_upload(task_id, "test.jsonl")
+    
+        with Path("labelu/tests/data/test.jsonl").open(mode="rb") as f:
+            jsonl_res = client.post(
+                f"{settings.API_V1_STR}/tasks/{task_id}/attachments",
+                headers=testuser_token_headers,
+                files={"file": ("test.jsonl", f, "application/json")},
+            )
+            
+        json = jsonl_res.json()
+        assert jsonl_res.status_code == 201
+        
+        parts = json["data"]["url"].split("/")[-3:]
+        assert Path(f"{settings.MEDIA_ROOT}").joinpath("/".join(parts)).exists()
+        
+    def test_file_exists(
+        self, client: TestClient, testuser_token_headers: dict, db: Session
+    ) -> None:
+         # prepare data
+        data = {
+            "name": "task name",
+            "description": "task description",
+            "tips": "task tips",
+        }
         task = client.post(
             f"{settings.API_V1_STR}/tasks", headers=testuser_token_headers, json=data
         )
         task_id = task.json()["data"]["id"]
 
-        # run
+        # upload file
         with Path("labelu/tests/data/test.png").open(mode="rb") as f:
-            new_res = client.post(
+            attachment = client.post(
                 f"{settings.API_V1_STR}/tasks/{task_id}/attachments",
                 headers=testuser_token_headers,
-                files={"file": ("test.png", f, "image/png")},
+                files={"file": f},
             )
-
-        # check
-        json = new_res.json()
-        assert new_res.status_code == 201
-        assert settings.HOST in json["data"]["url"]
-
-        parts = json["data"]["url"].split("/")[-3:]
-        assert Path(f"{settings.MEDIA_ROOT}").joinpath("/".join(parts)).exists()
-        parts[-1] = parts[-1][:8] + "-test-thumbnail.png"
-        assert Path(f"{settings.MEDIA_ROOT}").joinpath("/".join(parts)).exists()
+        
+        assert attachment.status_code == 400
 
     def test_upload_file_when_task_finished(
         self, client: TestClient, testuser_token_headers: dict, db: Session
@@ -61,6 +102,7 @@ class TestClassTaskAttachmentRouter:
             ),
         )
 
+        empty_task_upload(task.id, "test.png")
         # run
         with Path("labelu/tests/data/test.png").open(mode="rb") as f:
             new_res = client.post(
@@ -70,8 +112,7 @@ class TestClassTaskAttachmentRouter:
             )
 
         # check
-        assert new_res.status_code == 500
-        assert new_res.json()["err_code"] == 50001
+        assert new_res.status_code == 201
 
     def test_upload_file_not_image(
         self, client: TestClient, testuser_token_headers: dict, db: Session
@@ -87,6 +128,8 @@ class TestClassTaskAttachmentRouter:
             f"{settings.API_V1_STR}/tasks", headers=testuser_token_headers, json=data
         )
         task_id = task.json()["data"]["id"]
+        
+        empty_task_upload(task_id, "test.txt")
 
         # run
         with Path("labelu/tests/data/test.txt").open(mode="rb") as f:
@@ -99,7 +142,6 @@ class TestClassTaskAttachmentRouter:
         # check
         json = new_res.json()
         assert new_res.status_code == 201
-        assert settings.HOST in json["data"]["url"]
 
         parts = json["data"]["url"].split("/")[-3:]
         assert Path(f"{settings.MEDIA_ROOT}").joinpath("/".join(parts)).exists()
@@ -138,6 +180,8 @@ class TestClassTaskAttachmentRouter:
             f"{settings.API_V1_STR}/tasks", headers=testuser_token_headers, json=data
         )
         task_id = task.json()["data"]["id"]
+        
+        empty_task_upload(task_id, "test.png")
 
         # upload file
         with Path("labelu/tests/data/test.png").open(mode="rb") as f:
@@ -200,6 +244,9 @@ class TestClassTaskAttachmentRouter:
                 updated_by=current_user.id,
             ),
         )
+        
+        empty_task_upload(task.id, "test.png")
+        
         # upload file
         with Path("labelu/tests/data/test.png").open(mode="rb") as f:
             attachment = client.post(
@@ -212,7 +259,7 @@ class TestClassTaskAttachmentRouter:
 
         # run
         data = {"attachment_ids": [attachment_id]}
-        r = client.delete(
+        r = client.request("delete",
             f"{settings.API_V1_STR}/tasks/{task.id}/attachments",
             headers=testuser_token_headers,
             json=data,
@@ -233,7 +280,7 @@ class TestClassTaskAttachmentRouter:
 
         # run
         data = {"attachment_ids": [1]}
-        r = client.delete(
+        r = client.request("delete",
             f"{settings.API_V1_STR}/tasks/0/attachments",
             headers=testuser_token_headers,
             json=data,
@@ -261,7 +308,7 @@ class TestClassTaskAttachmentRouter:
 
         # run
         data = {"attachment_ids": [1]}
-        r = client.delete(
+        r = client.request("delete",
             f"{settings.API_V1_STR}/tasks/{task.id}/attachments",
             headers=testuser_token_headers,
             json=data,
