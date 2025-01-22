@@ -2,92 +2,150 @@
 <article style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
     <p align="center"><img width="300" src="https://user-images.githubusercontent.com/25022954/209616423-9ab056be-5d62-4eeb-b91d-3b20f64cfcf8.svg" /></p>
     <h1 style="width: 100%; text-align: center;"></h1>
+    <p align="center">
+        English | <a href="./README_zh-CN.md" >简体中文</a>
     </p>
 </article>
-
-<a href="./README_zh-CN.md" >简体中文</a> | English
-
-
+    
+   
 </div>
 
-## Introduction
+## Product Introduction
 
-LabelU is an open source data annotation tool that supports Chinese. At present, it has image annotation capabilities such as rectangle, polygon, point, line, classification, and caption. It can support detection, classification, segmentation, text transcription, Line detection, key point detection and other computer vision task scenarios. You can customize the annotation task by freely combining tools, and support COCO and MASK format data export.
+LabelU is a comprehensive data annotation platform designed for handling multimodal data. It offers a range of advanced annotation tools and efficient workflows, making it easier for users to tackle annotation tasks involving images, videos, and audio. LabelU is tailored to meet the demands of complex data analysis and model training.
+
+## Key Features
+
+### Versatile Image Annotation Tools
+LabelU provides a comprehensive set of tools for image annotation, including 2D bounding boxes, semantic segmentation, polylines, and keypoints. These tools can flexibly address a variety of image processing tasks, such as object detection, scene analysis, image recognition, and machine translation, helping users efficiently identify, annotate, and analyze images.
+
+### Powerful Video Annotation Capabilities
+In the realm of video annotation, LabelU showcases impressive processing capabilities, supporting video segmentation, video classification, and video information extraction. It is highly suitable for applications such as video retrieval, video summarization, and action recognition, enabling users to easily handle long-duration videos, accurately extract key information, and support complex scene analysis, providing high-quality annotated data for subsequent model training.
+
+### Efficient Audio Annotation Tools
+Audio annotation tools are another key feature of LabelU. These tools possess efficient and precise audio analysis capabilities, supporting audio segmentation, audio classification, and audio information extraction. By visualizing complex sound information, LabelU simplifies the audio data processing workflow, aiding in the development of more accurate models.
+
+### Artificial Intelligence Assisted Labelling
+LabelU supports one-click loading of pre-annotated data, which can be refined and adjusted according to actual needs. This feature improves the efficiency and accuracy of annotation.
+
+
+https://github.com/user-attachments/assets/0fa5bc39-20ba-46b6-9839-379a49f692cf
+
+
+
+
+## Features
+
+- Simplicity: Provides a variety of image annotation tools that can be annotated through simple visual configuration.
+- Flexibility: A variety of tools can be freely combined to meet most image, video, and audio annotation needs.
+- Universality: Supports exporting to various data formats, including JSON, COCO, MASK.
 
 ## Getting started
 
-### Download and Install miniconda
+- <a href="https://opendatalab.github.io/labelU-Kit/">
+    <button>Try LabelU annotation toolkit</button>
+</a>
 
-https://docs.conda.io/en/latest/miniconda.html
+- <a href="https://labelu.shlab.tech/">
+    <button>Try LabelU online</button>
+</a>
 
-### Create virtual environment(python = 3.10)
+### Local deployment
+
+1. Install [Miniconda](https://docs.conda.io/en/latest/miniconda.html), Choose the corresponding operating system type and download it for installation.
+
+> **Note：** If your system is MacOS with an Intel chip, please install [Miniconda of intel x86_64](https://repo.anaconda.com/miniconda/).
+
+2. After the installation is complete, run the following command in the terminal (you can choose the default 'y' for prompts during the process):
 
 ```bash
-conda create -n labelu python=3.10
+conda create -n labelu python=3.11
 ```
 
-### Activate virtual environment
+> **Note：** For Windows platform, you can run the above command in Anaconda Prompt.
+
+3. Activate the environment：
 
 ```bash
 conda activate labelu
 ```
 
-### Install labelu
+4. Install LabelU：
 
 ```bash
 pip install labelu
 ```
 
-### Start labelu, server: http://localhost:8000
+> To install the test version：`pip install labelu==<test revision> --pre`
+
+5. Run LabelU：
 
 ```bash
 labelu
 ```
 
-## feature
+6. Visit [http://localhost:8000/](http://localhost:8000/) and ready to go.
 
-- Uniform, Six image annotation tools are provided, which can be configured through simple visualization or Yaml
-- Unlimited, Multiple tools can be freely combined to meet most image annotation requirements
+### Local development
 
-<p align="center">
-<img style="width: 600px" src="https://user-images.githubusercontent.com/25022954/209318236-79d3a5c3-2700-46c3-b59a-62d9c132a6c3.gif">
-</p>
+```bash
+# Download and Install miniconda
+# https://docs.conda.io/en/latest/miniconda.html
 
-- Universal, Support multiple data export formats, including LabelU, COCO, Mask
+# Create virtual environment(python = 3.11)
+conda create -n labelu python=3.11
 
-## Scenes
+# Activate virtual environment
+conda activate labelu
 
-### Computer Vision
+# Install peotry
+# https://python-poetry.org/docs/#installing-with-the-official-installer
 
-- Detection: Detection scenes for vehicles, license plates, pedestrians, faces, industrial parts, etc.
-- Classification: Detection of object classification, target characteristics, right and wrong judgments, and other classification scenarios
-- Semantic segmentation: Human body segmentation, panoramic segmentation, drivable area segmentation, vehicle segmentation, etc.
-- Text transcription: Text detection and recognition of license plates, invoices, insurance policies, signs, etc.
-- Contour detection: positioning line scenes such as human contour lines, lane lines, etc.
-- Key point detection: positioning scenes such as human face key points, vehicle key points, road edge key points, etc.
+# Install all package dependencies
+poetry install
 
-## Usage
+# Download the frontend statics from labelu-kit repo
+sh ./scripts/resolve_frontend.sh true
 
--  [Guide](./docs/GUIDE.md) 
+# Start labelu, server: http://localhost:8000
+uvicorn labelu.main:app --reload
+```
 
-## Annotation Format
 
--  [LabelU Annotation Format](./docs/annotation%20format/README.md)
+## Quick start
+
+- [Guidance](https://opendatalab.github.io/labelU)
+
+## Annotation format
+
+- [Documentation](https://opendatalab.github.io/labelU/#/schema)
+
+## Citation
+
+```bibtex
+@article{he2024opendatalab,
+  title={Opendatalab: Empowering general artificial intelligence with open datasets},
+  author={He, Conghui and Li, Wei and Jin, Zhenjiang and Xu, Chao and Wang, Bin and Lin, Dahua},
+  journal={arXiv preprint arXiv:2407.13773},
+  year={2024}
+}
+```
 
 ## Communication
 
-Welcome to the Opendatalab Wechat group!
+Welcome to the OpenDataLab official WeChat group！
 
 <p align="center">
 <img style="width: 400px" src="https://user-images.githubusercontent.com/25022954/208374419-2dffb701-321a-4091-944d-5d913de79a15.jpg">
 </p>
 
 
-
 ## Links
 
-- [labelU-Kit](https://github.com/opendatalab/labelU-Kit)(Powered by labelU-Kit)
+- [LabelU-kit](https://github.com/opendatalab/labelU-Kit) Web front-end annotation kit (LabelU is based on this JavaScript kit)
+- [LabelLLM](https://github.com/opendatalab/LabelLLM) An Open-source LLM Dialogue Annotation Platform
+- [Miner U](https://github.com/opendatalab/MinerU) A One-stop Open-source High-quality Data Extraction Tool
 
-## LICENSE
+## License
 
 This project is released under the [Apache 2.0 license](./LICENSE).
